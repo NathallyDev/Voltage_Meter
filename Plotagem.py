@@ -14,25 +14,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import time
 
-def auto_select_serial_port():
-    # Lista todas as portas seriais disponíveis
-    ports = serial.tools.list_ports.comports()
-
-    print("Portas seriais disponíveis:")
-    for port, desc, hwid in sorted(ports):
-        print(f"{port}: {desc} [{hwid}]")
-
-    # Espera 5 segundos para o usuário visualizar a lista de portas
-    time.sleep(5)
-
-    # Seleciona automaticamente a primeira porta serial disponível
-    if ports:
-        selected_port = ports[0].device
-        print(f"Porta serial selecionada automaticamente: {selected_port}")
-        return selected_port
-    else:
-        print("Nenhuma porta serial disponível.")
-        return None
+# Código que ira puxar dados do arduino
 
 def read_and_plot_data(modelo, tempo_total_segundos):
     # Inicializa listas para armazenar dados
