@@ -1,6 +1,6 @@
 #
 # Realizando plotagem de gráfico e salvando em arquivo PDF
-# Data: 07/03/2024
+# Data: 11/03/2024
 #
 # Dev: Náthally Lima Arruda 
 # e-mail: nathallylym@gmail.com
