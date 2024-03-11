@@ -4,6 +4,7 @@ Este projeto consiste em um sistema para medir e registrar dados de tensão util
 
 ## Requisitos
 
+- Arduino 1.8.19
 - Python 3.x
 - Bibliotecas Python: pyserial, matplotlib, reportlab
 
