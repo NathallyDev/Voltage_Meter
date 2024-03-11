@@ -8,6 +8,7 @@
 //
 //
 
+//Possível alteração: alterar o circuito para um divisor de tensão
 void setup() {
   Serial.begin(9600); // Configuração da porta serial com taxa de 9600 bps
 }
