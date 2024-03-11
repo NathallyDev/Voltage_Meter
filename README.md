@@ -1,9 +1,10 @@
 # Voltimeter Sensor - Sistema de Aquisição e Plotagem de Dados
 
-Este projeto consiste em um sistema para medir e registrar dados de tensão utilizando um microcontrolador PIC. O script em Python recebe os dados, realiza a plotagem de gráficos e gera um PDF com as informações relevantes.
+Este projeto consiste em um sistema para medir e registrar dados de tensão utilizando um microcontrolador ARDUINO UNO. O script em Python recebe os dados, realiza a plotagem de gráficos e gera um PDF com as informações relevantes.
 
 ## Requisitos
 
+- Arduino 1.8.19
 - Python 3.x
 - Bibliotecas Python: pyserial, matplotlib, reportlab
 
