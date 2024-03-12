@@ -8,17 +8,18 @@
 //
 //
 
-//Possível alteração: alterar o circuito para um divisor de tensão
 void setup() {
   Serial.begin(9600); // Configuração da porta serial com taxa de 9600 bps
 }
 
 void loop() {
-  // Lê o valor do sensor de tensão (entrada A1)
+  // Lê o valor do sensor de tensão 
   int valorSensor = analogRead(A1);
 
-  // Converte o valor para a faixa de tensão (0-5V)
-  float tensao = valorSensor * (5.0 / 1023.0);
+  // Converte o valor para a faixa de tensão real usando o divisor de tensão
+  // Considerando resistores de 10k ohms para R1 e R2
+  // Valor lido * (5V / 1023) = tensão em volts
+  float tensao = (float)valorSensor * (5.0 / 1023.0) * (10000.0 + 10000.0) / 10000.0; 
 
   // Envio dos dados pela porta serial
   Serial.print(millis()); // Tempo
