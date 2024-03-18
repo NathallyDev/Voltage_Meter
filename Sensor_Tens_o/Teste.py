@@ -14,11 +14,11 @@ import matplotlib.pyplot as plt
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import time
-from serial.tools import list_ports
+from serial.tools.list_ports import comports
 
 def auto_select_serial_port():
     # Função para selecionar automaticamente a porta serial
-    ports = serial.tools.list_ports.comports()
+    ports = comports()
 
     print("Portas seriais disponíveis:")
     for port, desc, hwid in sorted(ports):
@@ -61,7 +61,7 @@ def read_and_plot_data(modelo, tempo_total_segundos, com_port):
 
     finally:
         ser.close()
-        plot_graph(tempo_total, tensao_total, f'Gráfico - Tensão ao Longo do Tempo ({modelo})')
+        return tempo_total, tensao_total
 
 def plot_graph(tempo, tensao, title):
     # Função para plotar o gráfico
@@ -82,14 +82,13 @@ def run_experiment():
 
     modelo = input("Digite o modelo (PS-835A, C/E ou PS-835B, D/F/G): ")
     if modelo in ["PS-835A, C/E", "PS-835B, D/F/G"]:
-        tempo_total_segundos = 45 * 60 if modelo == "PS-835A, C/E" else 90 * 60
+        tempo_total_segundos = 1 * 60 if modelo == "PS-835A, C/E" else 90 * 60
         tempo_total, tensao_total = read_and_plot_data(modelo, tempo_total_segundos, com_port)
+        titulo = f"Tensão ao Longo do Tempo ({modelo})"
+        observacao = input("O.B.S: ")
+        generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao_total, observacao)
     else:
         print("Modelo inválido. Escolha entre PS-835A, C/E ou PS-835B, D, F & G.")
-        return
-
-    titulo = f"Tensão ao Longo do Tempo ({modelo})"
-    observacao = input("O.B.S: ")
 
 def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo, tensao, observacao):
     # Função para gerar o PDF
@@ -101,7 +100,9 @@ def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo, tensao, obse
     pdf.drawString(72, 750, f"Nome: {nome}")
     pdf.drawString(72, 735, f"Fabricante: {fabricante}")
     pdf.drawString(72, 720, f"P/N: {p_n}")
-    pdf.drawString(72, 705, f"S/N: {s_n}")
+    pdf.drawString(72, 705, f"S/N: {s_n}") 
+    pdf.drawString(72, 705, f"O.B.S: {observacao}") 
+
     pdf.drawString(72, 690, f"Modelo: {modelo}")
 
     pdf.drawString(72, 660, f"Gráfico - {titulo}")
@@ -118,9 +119,6 @@ def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo, tensao, obse
     pdf.drawInlineImage("temp_plot.png", 72, 400, width=400, height=300)
 
     pdf.save()
-
-    # Gera o PDF
-    generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao_total, observacao)
 
 # Chama a função para iniciar o experimento
 run_experiment()
