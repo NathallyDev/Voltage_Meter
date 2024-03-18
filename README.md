@@ -26,4 +26,4 @@ Este projeto consiste em um sistema para medir e registrar dados de tensão DC d
 
    - Arduino UNO
    - Sensor de tensão DC (Modelo )
-   - Resistores em série (1x de ohm e 1x de ohm)
+   - Resistores em série (2x 1K ohm)
