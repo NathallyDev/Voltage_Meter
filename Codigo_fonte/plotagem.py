@@ -8,15 +8,15 @@
 #
 #
 
-
-
 import serial
 import matplotlib.pyplot as plt
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import time
-import os
 from serial.tools.list_ports import comports
+from io import BytesIO
+import tempfile
+import os
 
 def auto_select_serial_port():
     # Função para selecionar automaticamente a porta serial
@@ -55,7 +55,7 @@ def read_and_plot_data(modelo, tempo_total_segundos, com_port):
             data = ser.readline().decode('utf-8').strip()
             tempo_atual, tensao_atual = map(float, data.split(','))
 
-            tempo_total.append(tempo_atual)
+            tempo_total.append(tempo_atual / 60)  # Converter de segundos para minutos
             tensao_total.append(tensao_atual)
 
             time.sleep(intervalo_leitura)
@@ -71,10 +71,22 @@ def read_and_plot_data(modelo, tempo_total_segundos, com_port):
 def plot_graph(tempo, tensao, title):
     # Função para plotar o gráfico
     plt.plot(tempo, tensao)
-    plt.xlabel('Tempo (s)')
+    plt.xlabel('Tempo (min)')
     plt.ylabel('Tensão')
     plt.title(title)
-    plt.show()
+
+    if tensao:  # Verificar se há dados de tensão
+        # Definir os limites do eixo y para cobrir toda a variação dos dados
+        plt.ylim(min(tensao), max(tensao))
+
+    # Salvar o gráfico em um buffer de bytes
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plt.close()
+
+    return buffer
+
 
 def run_experiment():
     # Função para executar o experimento
@@ -91,12 +103,16 @@ def run_experiment():
         tempo_total, tensao_total = read_and_plot_data(modelo, tempo_total_segundos, com_port)
         titulo = f"Tensão ao Longo do Tempo ({modelo})"
         observacao = input("O.B.S: ")
-        generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao_total, observacao)
+
+        # Gerar o gráfico
+        graph_buffer = plot_graph(tempo_total, tensao_total, titulo)
+
+        generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao_total, observacao, graph_buffer)
         
     else:
         print("Modelo inválido. Escolha entre PS-835A, C/E ou PS-835B, D, F & G.")
 
-def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo, tensao, observacao):
+def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo, tensao, observacao, graph_buffer):
     # Função para gerar o PDF
     pdf_filename = f"Relatorio_{time.strftime('%Y%m%d_%H%M%S')}.pdf"
 
@@ -107,8 +123,6 @@ def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo, tensao, obse
     pdf.drawString(72, 735, f"Fabricante: {fabricante}")
     pdf.drawString(72, 720, f"P/N: {p_n}")
     pdf.drawString(72, 705, f"S/N: {s_n}") 
-    pdf.drawString(72, 705, f"O.B.S: {observacao}") 
-
     pdf.drawString(72, 690, f"Modelo: {modelo}")
 
     pdf.drawString(72, 660, f"Gráfico - {titulo}")
@@ -116,8 +130,19 @@ def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo, tensao, obse
     pdf.drawString(72, 630, "Observações:")
     pdf.drawString(72, 615, observacao)
 
-    pdf.save()  # Salva o PDF
+    # Salvar o buffer de bytes em um arquivo temporário
+    temp_filename = tempfile.NamedTemporaryFile(delete=False, suffix='.png')
+    temp_filename.write(graph_buffer.getvalue())
+    temp_filename.close()
 
-    # Abre o PDF após a geração
-    os.startfile(pdf_filename)
+    # Adicionar a imagem ao PDF
+    pdf.drawImage(temp_filename.name, 100, 400, width=400, height=300)
+
+    # Excluir o arquivo temporário após o uso
+    os.unlink(temp_filename.name)
+
+    pdf.save()  # Salvar o PDF
     print("PDF Gerado.")
+
+run_experiment()
+
