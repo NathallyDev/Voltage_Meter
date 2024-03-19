@@ -17,14 +17,14 @@ void loop() {
   int valorSensor = analogRead(A1);
 
   // Converte o valor para a faixa de tensão real usando o divisor de tensão
-  // Considerando resistores de 10k ohms para R1 e R2
+  // Considerando resistores de 1k ohms para R1 e R2
   // Valor lido * (5V / 1023) = tensão em volts
-  float tensao = (float)valorSensor * (5.0 / 1023.0) * (10000.0 + 10000.0) / 10000.0; 
+  float tensao = (float)valorSensor * (5.5 / 1023.0) * (1000.0 + 1000.0) / 1000.0;
 
   // Envio dos dados pela porta serial
   Serial.print(millis()); // Tempo
   Serial.print(",");
   Serial.println(tensao); // Tensão
 
-  delay(30000); // Aguarda 30 segundos antes da próxima leitura
+  delay(1000); // Aguarda 1 segundos antes da próxima leitura
 }

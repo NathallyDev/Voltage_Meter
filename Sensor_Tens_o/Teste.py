@@ -1,6 +1,6 @@
 #
 # Código Python para plotagem de gráficos e geração de PDF
-# Data: 11/03/2024
+# Data: 19/03/2024
 #
 # Dev: Náthally Lima Arruda 
 # e-mail: nathallylym@gmail.com
@@ -9,11 +9,13 @@
 #
 
 
+
 import serial
 import matplotlib.pyplot as plt
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import time
+import os
 from serial.tools.list_ports import comports
 
 def auto_select_serial_port():
@@ -24,8 +26,8 @@ def auto_select_serial_port():
     for port, desc, hwid in sorted(ports):
         print(f"{port}: {desc} [{hwid}]")
 
-    # Espera 5 segundos para o usuário visualizar a lista de portas
-    time.sleep(5)
+    # Espera 2 segundos para o usuário visualizar a lista de portas
+    time.sleep(2)
 
     # Seleciona automaticamente a primeira porta serial disponível
     if ports:
@@ -40,7 +42,9 @@ def read_and_plot_data(modelo, tempo_total_segundos, com_port):
     # Função para ler e plotar dados
     tempo_total = []
     tensao_total = []
-    intervalo_leitura = 30
+    intervalo_leitura = 1
+
+    print("Leitura em processamento...")
 
     try:
         ser = serial.Serial(com_port, 9600, timeout=1)
@@ -61,6 +65,7 @@ def read_and_plot_data(modelo, tempo_total_segundos, com_port):
 
     finally:
         ser.close()
+        print("Leitura finalizada.")
         return tempo_total, tensao_total
 
 def plot_graph(tempo, tensao, title):
@@ -82,11 +87,12 @@ def run_experiment():
 
     modelo = input("Digite o modelo (PS-835A, C/E ou PS-835B, D/F/G): ")
     if modelo in ["PS-835A, C/E", "PS-835B, D/F/G"]:
-        tempo_total_segundos = 1 * 60 if modelo == "PS-835A, C/E" else 90 * 60
+        tempo_total_segundos = 5 * 60 if modelo == "PS-835A, C/E" else 90 * 60
         tempo_total, tensao_total = read_and_plot_data(modelo, tempo_total_segundos, com_port)
         titulo = f"Tensão ao Longo do Tempo ({modelo})"
         observacao = input("O.B.S: ")
         generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao_total, observacao)
+        
     else:
         print("Modelo inválido. Escolha entre PS-835A, C/E ou PS-835B, D, F & G.")
 
@@ -110,15 +116,8 @@ def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo, tensao, obse
     pdf.drawString(72, 630, "Observações:")
     pdf.drawString(72, 615, observacao)
 
-    plt.plot(tempo, tensao)
-    plt.xlabel('Tempo (s)')
-    plt.ylabel('Tensão')
-    plt.title(titulo)
-    plt.savefig("temp_plot.png", format="png")
+    pdf.save()  # Salva o PDF
 
-    pdf.drawInlineImage("temp_plot.png", 72, 400, width=400, height=300)
-
-    pdf.save()
-
-# Chama a função para iniciar o experimento
-run_experiment()
+    # Abre o PDF após a geração
+    os.startfile(pdf_filename)
+    print("PDF Gerado.")
