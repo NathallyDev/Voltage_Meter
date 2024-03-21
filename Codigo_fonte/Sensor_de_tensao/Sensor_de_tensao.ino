@@ -1,6 +1,6 @@
 //
-// Código Arduino para ler dados de um sensor de tensão a cada 30 segundos e enviar pela porta serial
-// Data: 11/03/2024
+// Código Arduino para ler dados de um sensor de tensão a cada 1segundos e enviar pela porta serial
+// Data: 21/03/2024
 //
 // Dev: Náthally Lima Arruda 
 // e-mail: nathallylym@gmail.com
@@ -13,12 +13,10 @@ void setup() {
 }
 
 void loop() {
-  // Lê o valor do sensor de tensão 
+  // Lê o valor do sensor de tensão do sensor
   int valorSensor = analogRead(A11);
 
-  // Converte o valor para a faixa de tensão real usando o divisor de tensão
-  // Considerando resistores de 1k ohms para R1 e R2
-  // Valor lido * (5V / 1023) = tensão em volts
+  // Valor lido / Valor de conversão (Valor do arduino convertido para valor real)
   float tensao = (float)valorSensor/ 36.53571;
                                                                                                      
   // Envio dos dados pela porta serial
@@ -26,5 +24,5 @@ void loop() {
   Serial.print(",");
   Serial.println(tensao); // Tensão
 
-  delay(1000); // Aguarda 1 segundos antes da próxima leitura
+  delay(1000); // Aguarda 1 segundos entre as leituras
 }

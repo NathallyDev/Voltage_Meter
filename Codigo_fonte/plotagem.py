@@ -1,6 +1,6 @@
 #
 # Código Python para plotagem de gráficos e geração de PDF
-# Data: 19/03/2024
+# Data: 21/03/2024
 #
 # Dev: Náthally Lima Arruda 
 # e-mail: nathallylym@gmail.com
@@ -18,7 +18,6 @@ from io import BytesIO
 import tempfile
 import os
 import pdfkit
-
 
 def auto_select_serial_port():
     # Função para selecionar automaticamente a porta serial

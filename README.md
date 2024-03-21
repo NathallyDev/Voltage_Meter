@@ -1,17 +1,17 @@
 # Voltimeter Sensor - Sistema de Aquisição e Plotagem de Dados
 
-Este projeto consiste em um sistema para medir e registrar dados de tensão DC de 0-28V utilizando um microcontrolador ARDUINO UNO. O script em Python recebe os dados, realiza a plotagem de gráficos e gera um PDF com as informações relevantes.
+Este projeto consiste em um sistema para medir e registrar dados de tensão DC de 0-28V utilizando um microcontrolador ARDUINO MEGA 2560. O script em Python recebe os dados, realiza a plotagem de gráficos e gera um PDF com as informações relevantes.
 
 ## Progresso
 
-- Início: 07/03/24 
+- Início: 07/03/2024 
 - Status: Em andamento
 
 ## Requisitos
 
 - Arduino 1.8.19
 - Python 3.x
-- Bibliotecas Python: pyserial, matplotlib, reportlab
+- Bibliotecas Python: pyserial, matplotlib, reportlab, time, io, tempfile, os, pdfkit
 
 ## Configuração e Uso
 
@@ -24,6 +24,6 @@ Este projeto consiste em um sistema para medir e registrar dados de tensão DC d
 2. **Circuito**
    Certifica-se de possuir os componentes:
 
-   - Arduino UNO
-   - Sensor de tensão DC (Modelo )
-   - Resistores em série (2x 1K ohm)
+   - Arduino MEGA 2560
+   - Sensor de tensão DC (Model0: 0V ~ 25V)
+   - Resistores em série (1x 10K ohm)
