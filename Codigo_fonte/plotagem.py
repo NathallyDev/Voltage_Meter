@@ -18,6 +18,7 @@ from io import BytesIO
 import tempfile
 import os
 import pdfkit
+import numpy as np
 
 def auto_select_serial_port():
     # Função para selecionar automaticamente a porta serial
@@ -74,19 +75,22 @@ def read_and_plot_data(modelo, tempo_total_segundos, com_port):
         return None, None
 
     return tempo_total, tensao_total
-        
-def plot_graph(tempo, tensao, titulo, modelo):
-    # Função para plotar o gráfico
+
+def plot_graph(tempo, tensao, titulo, modelo, t_graph, tempo_total_segundos):
+    # Definir o tamanho da figura para garantir clareza
+    plt.figure(figsize=(10, 6))
+    tempo = [i for i in range(tempo_total_segundos + 1)]
+    tempo = tempo /
+
+    # Plotar o gráfico
     plt.plot(tempo, tensao)
-    plt.xlabel('Tempo (min)')  # Corrigido para definir o rótulo do eixo x como uma string
+    plt.xlabel('Tempo (min)')
     plt.ylabel('Tensão')
     plt.title(titulo)
+    plt.ylim(0, 30)
 
-    # Definir os limites do eixo y
-    if modelo == "PS-835A, C/E":
-        plt.ylim(0, 30)
-    else:
-        plt.ylim(0, 30)
+    # Adicionar grade ao gráfico
+    plt.grid(True)
 
     # Salvar o gráfico em um buffer de bytes
     buffer = BytesIO()
@@ -100,56 +104,52 @@ def run_experiment():
     # Função para executar o experimento
     com_port = auto_select_serial_port()
 
-    nome = input("Digite o nome do equipamento: ")
-    fabricante = input("Digite o fabricante: ")
-    p_n = input("Digite o P/N: ")
-    s_n = input("Digite o S/N: ")
+    # Dados que serão inseridos pelo usuário
+    nome = input("Nome do equipamento: ")
+    fabricante = input("Nome do fabricante: ")
+    p_n = input("P/N: ")
+    s_n = input("S/N: ")
+    modelo = input("Modelo do equipamento: ")
+    t_graph = int(input("Informe o tempo para a realização do teste (em minutos): "))  # Convertendo para inteiro
 
-    modelo = input("Digite o modelo (PS-835A, C/E ou PS-835B, D/F/G): ")
-    if modelo in ["PS-835A, C/E", "PS-835B, D/F/G"]:
-        tempo_total_segundos = 1 * 60 if modelo == "PS-835A, C/E" else 90 * 60
-        tempo_total, tensao_total = read_and_plot_data(modelo, tempo_total_segundos, com_port)
-        titulo = f"Tensão ao Longo do Tempo ({modelo})"
-        observacao = input("O.B.S: ")
+    tempo_total_segundos = t_graph * 60
+    tempo_total, tensao_total = read_and_plot_data(modelo, tempo_total_segundos, com_port)
+    titulo = f"Tensão ao Longo do Tempo ({modelo})"
+    
+    ad = input("Houve AD: ")
+    num_ad = input("Informe o número da AD: ")
+    observacao = input("O.B.S: ")
 
-        # Gerar o gráfico
-        graph_buffer = plot_graph(tempo_total, tensao_total, titulo, modelo)  # Passar o modelo como argumento
+    # Gera o gráfico
+    graph_buffer = plot_graph(tempo_total, tensao_total, titulo, modelo, t_graph)  # Passa o valor de t_graph como argumento
 
-        generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao_total, observacao, graph_buffer)
-        
-    else:
-        print("Modelo inválido. Escolha entre PS-835A, C/E ou PS-835B, D, F & G.")
+    generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao_total, observacao, graph_buffer, ad, num_ad)
 
-def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo, tensao, observacao, graph_buffer):
-    # Gerar o nome do arquivo PDF
-    pdf_filename = f"Relatorio_{time.strftime('%Y%m%d_%H%M%S')}.pdf"
+def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao_total, observacao, graph_buffer, ad, num_ad):
+    # Gera o nome do arquivo PDF
+    pdf_filename = f"{p_n}_{s_n}_{time.strftime('%Y%m%d_%H%M%S')}.pdf"
 
-    # Iniciar o documento PDF
+    # Inicia o documento PDF
     pdf = canvas.Canvas(pdf_filename, pagesize=letter)
     pdf.setFont("Helvetica", 12)
 
-    # Escrever o cabeçalho
+    # Escreve o cabeçalho
     pdf.drawString(72, 750, f"Equipamento: {nome}       Fabricante: {fabricante}")
-    pdf.drawString(72, 735, f"Modelo: {modelo}       P/N: {p_n}    S/N: {s_n}")
+    pdf.drawString(72, 735, f"Modelo: {modelo}       P/N: {p_n}    S/N: {s_n}    AD: {ad}       AD NUMBER: {num_ad}")
 
-    # Adicionar o buffer de bytes do gráfico ao PDF
+    # Adiciona o buffer de bytes do gráfico ao PDF
     temp_filename = tempfile.NamedTemporaryFile(delete=False, suffix='.png')
     temp_filename.write(graph_buffer.getvalue())
     temp_filename.close()
     pdf.drawImage(temp_filename.name, 100, 400, width=400, height=300)
     os.unlink(temp_filename.name)
 
-    # Escrever as observações
-    pdf.drawString(72, 350, "Observações:")
-    obs_lines = observacao.split('\n')
-    y_position = 335
-    for line in obs_lines:
-        pdf.drawString(72, y_position, line)
-        y_position -= 15
+    # Escreve as observações abaixo do grafico
+    pdf.drawString(72, 350, f"Observações: {observacao}")
 
-    # Salvar o PDF
+
+    # Salva o PDF
     pdf.save()
     print("PDF Gerado.")
 
 run_experiment()
-

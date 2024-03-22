@@ -5,6 +5,7 @@ Este projeto consiste em um sistema para medir e registrar dados de tensão DC d
 ## Progresso
 
 - Início: 07/03/2024 
+- Atualização: 21/03/2024
 - Status: Em andamento
 
 ## Requisitos
@@ -19,7 +20,7 @@ Este projeto consiste em um sistema para medir e registrar dados de tensão DC d
    Certifique-se de ter as bibliotecas necessárias instaladas. Execute o seguinte comando para instalá-las:
 
    ```bash
-   pip install pyserial matplotlib reportlab
+   pip install pyserial matplotlib reportlab winshell
 
 2. **Circuito**
    Certifica-se de possuir os componentes:
