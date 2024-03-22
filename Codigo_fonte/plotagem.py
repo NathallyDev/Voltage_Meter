@@ -9,7 +9,7 @@
 #
 
 import serial
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # Adicionando importação do módulo matplotlib.pyplot
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import time
@@ -24,20 +24,15 @@ def auto_select_serial_port():
     # Função para selecionar automaticamente a porta serial
     ports = comports()
 
-    print("Portas seriais disponíveis:")
     for port, desc, hwid in sorted(ports):
-        print(f"{port}: {desc} [{hwid}]")
+        pass
 
-    # Espera 2 segundos para o usuário visualizar a lista de portas
     time.sleep(2)
 
-    # Seleciona automaticamente a primeira porta serial disponível
     if ports:
         selected_port = ports[0].device
-        print(f"Porta serial selecionada automaticamente: {selected_port}")
         return selected_port
     else:
-        print("Nenhuma porta serial disponível.")
         return None
 
 def read_and_plot_data(modelo, tempo_total_segundos, com_port):
@@ -46,8 +41,9 @@ def read_and_plot_data(modelo, tempo_total_segundos, com_port):
     tensao_total = []
     intervalo_leitura = 1
 
-    print("Leitura em processamento...")
+    print("Iniciando coleta de dados...")
 
+    ser = None
     try:
         ser = serial.Serial(com_port, 9600, timeout=1)
 
@@ -64,30 +60,32 @@ def read_and_plot_data(modelo, tempo_total_segundos, com_port):
 
     except KeyboardInterrupt:
         pass
+    except Exception as e:
+        print(f"Erro ao ler da porta serial: {e}")
 
     finally:
-        ser.close()
-        print("Leitura finalizada.")
+        if ser:
+            ser.close()
+        print("Fim da coleta de dados.")
 
-    # Verifica se houve leitura de dados
     if not tempo_total or not tensao_total:
         print("Nenhum dado lido.")
         return None, None
 
     return tempo_total, tensao_total
 
-def plot_graph(tempo, tensao, titulo, modelo, t_graph, tempo_total_segundos):
+def plot_graph(tempo, tensao, titulo, modelo, t_graph):
     # Definir o tamanho da figura para garantir clareza
     plt.figure(figsize=(10, 6))
-    tempo = [i for i in range(tempo_total_segundos + 1)]
-    tempo = tempo /
+    tempo_minutos = [t / 60000 for t in tempo]  # Converter milissegundos para minutos
 
     # Plotar o gráfico
-    plt.plot(tempo, tensao)
+    plt.plot(tempo_minutos, tensao)
     plt.xlabel('Tempo (min)')
     plt.ylabel('Tensão')
     plt.title(titulo)
     plt.ylim(0, 30)
+    plt.xlim(0, t_graph + 1)  # Adiciona uma unidade extra ao limite máximo do eixo x
 
     # Adicionar grade ao gráfico
     plt.grid(True)
@@ -104,13 +102,16 @@ def run_experiment():
     # Função para executar o experimento
     com_port = auto_select_serial_port()
 
-    # Dados que serão inseridos pelo usuário
+    if com_port is None:
+        print("Não foi possível selecionar uma porta serial.")
+        return
+
     nome = input("Nome do equipamento: ")
     fabricante = input("Nome do fabricante: ")
     p_n = input("P/N: ")
     s_n = input("S/N: ")
     modelo = input("Modelo do equipamento: ")
-    t_graph = int(input("Informe o tempo para a realização do teste (em minutos): "))  # Convertendo para inteiro
+    t_graph = int(input("Informe o tempo para a realização do teste (em minutos): "))
 
     tempo_total_segundos = t_graph * 60
     tempo_total, tensao_total = read_and_plot_data(modelo, tempo_total_segundos, com_port)
@@ -120,36 +121,35 @@ def run_experiment():
     num_ad = input("Informe o número da AD: ")
     observacao = input("O.B.S: ")
 
-    # Gera o gráfico
-    graph_buffer = plot_graph(tempo_total, tensao_total, titulo, modelo, t_graph)  # Passa o valor de t_graph como argumento
+    graph_buffer = plot_graph(tempo_total, tensao_total, titulo, modelo, t_graph)
 
     generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao_total, observacao, graph_buffer, ad, num_ad)
 
 def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao_total, observacao, graph_buffer, ad, num_ad):
-    # Gera o nome do arquivo PDF
     pdf_filename = f"{p_n}_{s_n}_{time.strftime('%Y%m%d_%H%M%S')}.pdf"
 
-    # Inicia o documento PDF
     pdf = canvas.Canvas(pdf_filename, pagesize=letter)
     pdf.setFont("Helvetica", 12)
 
-    # Escreve o cabeçalho
     pdf.drawString(72, 750, f"Equipamento: {nome}       Fabricante: {fabricante}")
     pdf.drawString(72, 735, f"Modelo: {modelo}       P/N: {p_n}    S/N: {s_n}    AD: {ad}       AD NUMBER: {num_ad}")
 
-    # Adiciona o buffer de bytes do gráfico ao PDF
-    temp_filename = tempfile.NamedTemporaryFile(delete=False, suffix='.png')
-    temp_filename.write(graph_buffer.getvalue())
-    temp_filename.close()
-    pdf.drawImage(temp_filename.name, 100, 400, width=400, height=300)
-    os.unlink(temp_filename.name)
+    # Salvar o buffer de bytes em um arquivo temporário
+    temp_filename = f"{p_n}_{s_n}_{time.strftime('%Y%m%d_%H%M%S')}.png"
+    with open(temp_filename, 'wb') as f:
+        f.write(graph_buffer.getvalue())
 
-    # Escreve as observações abaixo do grafico
+    # Adiciona a imagem do gráfico ao PDF
+    pdf.drawImage(temp_filename, 100, 400, width=400, height=300)
+
+    # Escreve as observações abaixo do gráfico
     pdf.drawString(72, 350, f"Observações: {observacao}")
-
 
     # Salva o PDF
     pdf.save()
     print("PDF Gerado.")
+
+    # Remover o arquivo temporário após salvar o PDF
+    os.unlink(temp_filename)
 
 run_experiment()
