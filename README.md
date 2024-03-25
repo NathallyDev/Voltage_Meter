@@ -5,8 +5,8 @@ Este projeto consiste em um sistema para medir e registrar dados de tensão DC d
 ## Progresso
 
 - Início: 07/03/2024 
-- Atualização: 21/03/2024
-- Status: Em andamento
+- Atualização: 25/03/2024
+- Status: Completo
 
 ## Requisitos
 

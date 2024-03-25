@@ -1,6 +1,6 @@
 #
 # Código Python para plotagem de gráficos e geração de PDF
-# Data: 21/03/2024
+# Data: 25/03/2024
 #
 # Dev: Náthally Lima Arruda 
 # e-mail: nathallylym@gmail.com
@@ -81,7 +81,7 @@ def plot_graph(tempo, tensao, titulo, modelo, t_graph):
     plt.ylabel('Tensão')
     plt.title(titulo)
     plt.ylim(0, 30)
-    plt.xlim(0, t_graph + 1)
+    plt.xlim(0, t_graph + 0.5)
     plt.grid(True)
 
     buffer = BytesIO()
@@ -162,13 +162,15 @@ def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao
             img = Image.open(image_name)
             img_width, img_height = img.size  # Atualiza o valor de img_height se a imagem existir
             pdf.drawImage(image_name, 100, 50, width=400, height=300)
-            pdf.drawString(72, 50 + img_height + 30, f"Observações: {observacao}")
+            observacao_y = 720
         else:
             print(f"Imagem {image_name} não encontrada na pasta do código.")
-            pdf.drawString(72, 50 + img_height + 30, f"Observações: {observacao}")
     else:
         print(f"P/N {p_n} não encontrado no dicionário de imagens.")
-        pdf.drawString(72, 400, f"Observações: {observacao}")
+        observacao_y = 390
+
+    # Adiciona as observações ao PDF
+    pdf.drawString(72, observacao_y, f"Observações: {observacao}")
 
     pdf.save()
     print("PDF Gerado.")
@@ -179,7 +181,6 @@ def generate_pdf(nome, fabricante, p_n, s_n, modelo, titulo, tempo_total, tensao
 run_experiment()
 
 
-run_experiment()
 
 
         
