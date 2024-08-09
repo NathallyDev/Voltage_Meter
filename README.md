@@ -1,30 +1,30 @@
-# Voltimeter Sensor - Sistema de Aquisição e Plotagem de Dados
+# Voltimeter Sensor - Data Acquisition and Plotting System
 
-Este projeto consiste em um sistema para medir e registrar dados de tensão DC de 0-28V utilizando um microcontrolador ARDUINO MEGA 2560. O script em Python recebe os dados, realiza a plotagem de gráficos e gera um PDF com as informações relevantes.
+This project consists of a system to measure and record DC voltage data from 0-28V using an ARDUINO MEGA 2560 microcontroller. The Python script receives the data, plots graphs and generates a PDF with the relevant information.
 
-## Progresso
+## Progress
 
-- Início: 07/03/2024 
-- Atualização: 25/03/2024
-- Status: Completo
+- Start: 03/07/2024
+- Update: 09/28/2024
+- Status: Complete
 
-## Requisitos
+## Requirements
 
 - Arduino 1.8.19
 - Python 3.x
-- Bibliotecas Python: pyserial, matplotlib, reportlab, time, io, tempfile, os, pdfkit
+- Python libraries: pyserial, matplotlib, reportlab, time, io, tempfile, os, pdfkit
 
-## Configuração e Uso
+## Configuration and Usage
 
-1. **Instalação de Dependências:**
-   Certifique-se de ter as bibliotecas necessárias instaladas. Execute o seguinte comando para instalá-las:
+1. **Installing Dependencies:**
+Make sure you have the necessary libraries installed. Run the following command to install them:
 
-   ```bash
-   pip install pyserial matplotlib reportlab winshell
+```bash
+pip install pyserial matplotlib reportlab winshell
 
-2. **Circuito**
-   Certifica-se de possuir os componentes:
+2. **Circuit**
+Make sure you have the following components:
 
-   - Arduino MEGA 2560
-   - Sensor de tensão DC (Model0: 0V ~ 25V)
-   - Resistores em série (1x 10K ohm)
+- Arduino MEGA 2560
+- DC voltage sensor (Model0: 0V ~ 25V)
+- Series resistors (1x 10K ohm)
