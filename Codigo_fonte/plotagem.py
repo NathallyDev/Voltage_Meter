@@ -1,13 +1,3 @@
-#
-# Código Python para plotagem de gráficos e geração de PDF
-# Data: 25/03/2024
-#
-# Dev: Náthally Lima Arruda 
-# e-mail: nathallylym@gmail.com
-#
-#
-#
-
 import serial
 import matplotlib.pyplot as plt
 from reportlab.pdfgen import canvas

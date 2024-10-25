@@ -1,13 +1,3 @@
-//
-// Código Arduino para ler dados de um sensor de tensão a cada 1segundos e enviar pela porta serial
-// Data: 21/03/2024
-//
-// Dev: Náthally Lima Arruda 
-// e-mail: nathallylym@gmail.com
-//
-//
-//
-
 void setup() {
   Serial.begin(9600); // Configuração da porta serial com taxa de 9600 bps
 }
